@@ -17,7 +17,10 @@ func splitFont(s string) (string, int, error) {
 		if unicode.IsDigit(r) {
 			val, err := strconv.Atoi(s[i:])
 			if err != nil {
-				return "", 0, err
+				val, err = strconv.Atoi(string(s[i]))
+				if err != nil {
+					return "", 0, err
+				}
 			}
 			return prefix, val, nil
 		}
@@ -32,7 +35,6 @@ func (c *crawlResultFonts) parse(propVal *[]byte) error {
 	if err != nil {
 		return err
 	}
-
 
 	for _, prop := range props {
 		var crFont crawlResultFont
@@ -82,5 +84,5 @@ func (c *crawlResultFonts) maxFontIndex() int {
 type crawlResultFont struct {
 	fontIndex int
 	fontObjID int
-	prefix string
+	prefix    string
 }
