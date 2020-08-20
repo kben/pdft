@@ -10,23 +10,25 @@ import (
 
 type crawlResultFonts []crawlResultFont
 
-// Split a font string like '/F1' or '/TT2' into the prefix and index
-func splitFont(s string) (string, int, error) {
+// Split a font string like '/F1' or '/TT2' into the prefix and index and postfix
+func splitFont(s string) (string, int, string, error) {
 	prefix := ""
+	postfix := ""
 	for i, r := range s {
 		if unicode.IsDigit(r) {
 			val, err := strconv.Atoi(s[i:])
 			if err != nil {
 				val, err = strconv.Atoi(string(s[i]))
 				if err != nil {
-					return "", 0, err
+					return "", 0, "", err
 				}
+				postfix = s[i+1:]
 			}
-			return prefix, val, nil
+			return prefix, val, postfix, nil
 		}
 		prefix += string(r)
 	}
-	return "", 0, fmt.Errorf("No font index")
+	return "", 0, "", fmt.Errorf("No font index")
 }
 
 func (c *crawlResultFonts) parse(propVal *[]byte) error {
@@ -39,7 +41,7 @@ func (c *crawlResultFonts) parse(propVal *[]byte) error {
 	for _, prop := range props {
 		var crFont crawlResultFont
 
-		prefix, fontIndex, err := splitFont(strings.TrimSpace(prop.key))
+		prefix, fontIndex, postfix, err := splitFont(strings.TrimSpace(prop.key))
 		if err != nil {
 			return err
 		}
@@ -48,6 +50,7 @@ func (c *crawlResultFonts) parse(propVal *[]byte) error {
 			return err
 		}
 		crFont.prefix = prefix
+		crFont.postfix = postfix
 		crFont.fontIndex = fontIndex
 		crFont.fontObjID = objID
 		*c = append(*c, crFont)
@@ -68,6 +71,7 @@ func (c *crawlResultFonts) append(fontIndex int, fontObjID int) {
 	crFont.fontIndex = fontIndex
 	crFont.fontObjID = fontObjID
 	crFont.prefix = "F"
+	crFont.postfix = ""
 	*c = append(*c, crFont)
 }
 
@@ -85,4 +89,5 @@ type crawlResultFont struct {
 	fontIndex int
 	fontObjID int
 	prefix    string
+	postfix   string
 }
