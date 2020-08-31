@@ -3,7 +3,6 @@ package pdft
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"unicode"
@@ -63,7 +62,6 @@ func (c *crawlResultFonts) String() string {
 	var buff bytes.Buffer
 	for _, f := range *c {
 		buff.WriteString(fmt.Sprintf("/%s%d%s %d 0 R\n", f.prefix, f.fontIndex, f.postfix, f.fontObjID))
-		log.Printf("JOJO %v", fmt.Sprintf("/%s%d%s %d 0 R\n", f.prefix, f.fontIndex, f.postfix, f.fontObjID))
 	}
 	return buff.String()
 }
